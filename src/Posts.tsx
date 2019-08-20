@@ -1,12 +1,12 @@
 import React from 'react';
 
 const API = 'http://localhost:4000/api/v1/posts';
-type IProps = {};
+type Props = {};
 
-type IState = {
+type State = {
   posts: Post[];
   isLoading: boolean;
-  errors: any;
+  errors: Error[];
 };
 type Post = {
   id: number;
@@ -17,20 +17,20 @@ type Post = {
   modified: Date;
 };
 
-class Posts extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
+class Posts extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       posts: [],
-      isLoading: true,
-      errors: null
+      isLoading: false,
+      errors: []
     };
   }
   componentDidMount() {
-    setTimeout(this.getAndSetPosts, 5000);
+    this.getAndSetPosts();
   }
-  getAndSetPosts = () => {
-    this.setState({ isLoading: true, errors: null });
+  getAndSetPosts = async () => {
+    this.setState({ isLoading: true, errors: [] });
     fetch(API)
       .then(response => {
         if (!response.ok) {
