@@ -1,4 +1,5 @@
 import React from 'react';
+import Moment from 'react-moment';
 
 const API = 'http://localhost:4000/api/v1/';
 type Props = {};
@@ -7,8 +8,8 @@ type State = {
   posts: Post[];
   categories: Category[];
   isLoading: boolean;
-  errors: Error[];
-  newPostErrors: Error[];
+  errors: any;
+  newPostErrors: string;
   formIsValid: boolean;
   topicValue: string;
   topicValid: boolean;
@@ -16,7 +17,10 @@ type State = {
   postValid: boolean;
   categoryValue: string;
   pinnedValue: boolean;
-  pinnedValid: boolean;
+  postsLoading: boolean;
+  categoriesLoading: boolean;
+  topicError: string;
+  postError: string;
 };
 type Post = {
   id: number;
@@ -38,8 +42,8 @@ class Posts extends React.Component<Props, State> {
     this.state = {
       posts: [],
       isLoading: false,
-      errors: [],
-      newPostErrors: [],
+      errors: undefined,
+      newPostErrors: '',
       categories: [],
       formIsValid: false,
       topicValue: '',
@@ -47,15 +51,37 @@ class Posts extends React.Component<Props, State> {
       postValue: '',
       postValid: false,
       pinnedValue: false,
-      pinnedValid: true,
-      categoryValue: '1'
+      categoryValue: '1',
+      postsLoading: false,
+      categoriesLoading: false,
+      topicError: '',
+      postError: ''
     };
   }
   componentDidMount() {
-    this.getAndSetPosts();
-    this.getCategories();
+    this.loadPostsAndCategories();
   }
+  loadPostsAndCategories = async () => {
+    this.setState({ isLoading: true, errors: undefined });
+    await this.getAndSetPosts();
+    await this.getCategories();
+  };
+  getAndSetPosts = async () => {
+    this.setState({ postsLoading: true });
+    fetch(API + 'posts')
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        } else {
+          return response.json();
+        }
+      })
+      .then(data => this.setState({ posts: data, postsLoading: false }))
+      .then(() => this.isBothLoaded())
+      .catch(errors => this.setState({ errors, isLoading: false }));
+  };
   getCategories = async () => {
+    this.setState({ categoriesLoading: true });
     fetch(API + 'categories')
       .then(response => {
         if (!response.ok) {
@@ -64,8 +90,38 @@ class Posts extends React.Component<Props, State> {
           return response.json();
         }
       })
-      .then(data => this.setState({ categories: data, isLoading: false }))
+      .then(data => this.setState({ categories: data, categoriesLoading: false }))
+      .then(() => this.isBothLoaded())
       .catch(errors => this.setState({ errors, isLoading: false }));
+  };
+  saveNewPost = async () => {
+    const data = {
+      post: this.state.postValue,
+      topic: this.state.topicValue,
+      pinned: this.state.pinnedValue,
+      categoryId: parseInt(this.state.categoryValue)
+    };
+
+    fetch(API + 'posts', {
+      method: 'POST',
+      mode: 'cors',
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      referrer: 'no-referrer',
+      body: JSON.stringify(data)
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw Error(response.statusText);
+        } else {
+          return response.json();
+        }
+      })
+      .then(data => this.setState({ posts: [...this.state.posts, data] }))
+      .catch(() => this.setState({ newPostErrors: 'Could not save the post!' }));
   };
   handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = event.target.value;
@@ -79,6 +135,7 @@ class Posts extends React.Component<Props, State> {
       postValue: post
     });
     this.validatePost(post);
+    this.isAllValid();
   };
   handleTopicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const topic = event.target.value;
@@ -86,88 +143,54 @@ class Posts extends React.Component<Props, State> {
       topicValue: topic
     });
     this.validateTopic(topic);
+    this.isAllValid();
   };
   handlePinnedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const pinned = event.target.checked;
     this.setState({
       pinnedValue: pinned
     });
-    this.validatePinned(pinned);
   };
   handleSubmit = async (event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
     event.preventDefault();
     this.saveNewPost();
   };
-  saveNewPost = async () => {
-    const data = {
-      post: this.state.postValue,
-      topic: this.state.topicValue,
-      pinned: this.state.pinnedValue,
-      categoryId: parseInt(this.state.categoryValue)
-    };
 
-    return fetch(API + 'posts', {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'no-cache',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      referrer: 'no-referrer',
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(data => this.setState({ posts: [...this.state.posts, data] }))
-      .catch(errors => this.setState({ newPostErrors: errors }));
-  };
-
-  getAndSetPosts = async () => {
-    this.setState({ isLoading: true, errors: [] });
-    fetch(API + 'posts')
-      .then(response => {
-        if (!response.ok) {
-          throw Error(response.statusText);
-        } else {
-          return response.json();
-        }
-      })
-      .then(data => this.setState({ posts: data, isLoading: false }))
-      .catch(errors => this.setState({ errors, isLoading: false }));
-  };
   validatePost = (post: String) => {
-    if (post.length >= 10 && post.length <= 255) {
-      this.setState({ postValid: true });
+    if (post.length < 10) {
+      this.setState({ postError: 'Post is too short', postValid: false });
+    } else if (post.length > 255) {
+      this.setState({ postError: 'Post is too long', postValid: false });
     } else {
-      this.setState({ postValid: false });
+      this.setState({ postError: '', postValid: true });
     }
-    this.isAllValid();
   };
   validateTopic = (topic: String) => {
-    if (topic.length >= 5 && topic.length <= 50) {
-      this.setState({ topicValid: true });
+    if (topic.length < 5) {
+      this.setState({ topicError: 'Topic is too short', topicValid: false });
+    } else if (topic.length > 50) {
+      this.setState({ topicError: 'Topic is too long', topicValid: false });
     } else {
-      this.setState({ topicValid: false });
+      this.setState({ topicError: '', topicValid: true });
     }
-    this.isAllValid();
-  };
-  validatePinned = (pinned: boolean) => {
-    if (pinned === true || pinned === false) {
-      this.setState({ pinnedValid: true });
-      this.isAllValid();
-    } else {
-      this.setState({ pinnedValid: false });
-    }
-    this.isAllValid();
   };
 
   isAllValid = () => {
-    console.log(this.state.postValid, this.state.topicValid, this.state.pinnedValid);
-    if (this.state.postValid && this.state.topicValid && this.state.pinnedValid) {
+    if (this.state.postValid && this.state.topicValid) {
       this.setState({ formIsValid: true });
     } else {
       this.setState({ formIsValid: false });
     }
+  };
+  isBothLoaded = () => {
+    if (!this.state.postsLoading && !this.state.categoriesLoading) {
+      this.setState({ isLoading: false });
+    } else {
+      this.setState({ isLoading: true });
+    }
+  };
+  formatTime = (date: Date) => {
+    return date.toLocaleTimeString();
   };
 
   render() {
@@ -180,17 +203,20 @@ class Posts extends React.Component<Props, State> {
       postValue,
       topicValue,
       pinnedValue,
-      formIsValid
+      formIsValid,
+      newPostErrors,
+      postError,
+      topicError
     } = this.state;
 
     if (isLoading) {
       return <p>Loading posts...</p>;
     }
-    if (errors === []) {
+    if (errors) {
       return (
         <div className="errorContainer">
           <p>Loading posts failed!</p>
-          <button onClick={this.getAndSetPosts}>Try again</button>
+          <button onClick={this.loadPostsAndCategories}>Try again</button>
         </div>
       );
     }
@@ -202,26 +228,35 @@ class Posts extends React.Component<Props, State> {
           <div key={post.id} className="posts">
             <h5 className="post-topic">{post.topic}</h5>
             <h6 className="post-post">{post.post}</h6>
+            <Moment format="HH:mm DD.MM.YYYY">{post.datetime.toString()}</Moment>
           </div>
         ))}
         <form>
           <div>
-            <input
-              type="text"
-              placeholder="Insert topic here.."
-              name="topic"
-              value={topicValue}
-              onChange={this.handleTopicChange}
-            />
+            <label>
+              Topic:
+              <input
+                type="text"
+                placeholder="Insert topic here.."
+                name="topic"
+                value={topicValue}
+                onChange={this.handleTopicChange}
+              />
+            </label>
+            {topicError}
           </div>
-          <label>
-            Post:
-            <textarea
-              value={postValue}
-              placeholder="Insert post here.."
-              onChange={this.handlePostChange}
-            />
-          </label>
+          <div>
+            <label>
+              Post:
+              <textarea
+                value={postValue}
+                placeholder="Insert post here.."
+                onChange={this.handlePostChange}
+              />
+            </label>
+            {postError}
+          </div>
+
           <label>
             Pinned:
             <input
@@ -249,6 +284,7 @@ class Posts extends React.Component<Props, State> {
             disabled={!formIsValid}
             onClick={this.handleSubmit}
           />
+          <div className="postingErrors">{newPostErrors}</div>
         </form>
       </div>
     );
