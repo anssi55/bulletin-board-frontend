@@ -189,9 +189,6 @@ class Posts extends React.Component<Props, State> {
       this.setState({ isLoading: true });
     }
   };
-  formatTime = (date: Date) => {
-    return date.toLocaleTimeString();
-  };
 
   render() {
     const {
