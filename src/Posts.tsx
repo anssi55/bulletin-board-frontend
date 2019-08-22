@@ -70,29 +70,33 @@ class Posts extends React.Component<Props, State> {
     this.setState({ postsLoading: true });
     fetch(API + 'posts')
       .then(response => {
-        if (!response.ok) {
-          throw Error(response.statusText);
-        } else {
+        if (response.status === 404) {
+          return [];
+        } else if (response.ok) {
           return response.json();
+        } else {
+          throw Error(response.statusText);
         }
       })
       .then(data => this.setState({ posts: data, postsLoading: false }))
-      .then(() => this.isBothLoaded())
-      .catch(errors => this.setState({ errors, isLoading: false }));
+      .catch(errors => this.setState({ errors, postsLoading: false }))
+      .then(() => this.isBothLoaded());
   };
   getCategories = async () => {
     this.setState({ categoriesLoading: true });
     fetch(API + 'categories')
       .then(response => {
-        if (!response.ok) {
-          throw Error(response.statusText);
-        } else {
+        if (response.status === 404) {
+          return [];
+        } else if (response.ok) {
           return response.json();
+        } else {
+          throw Error(response.statusText);
         }
       })
       .then(data => this.setState({ categories: data, categoriesLoading: false }))
-      .then(() => this.isBothLoaded())
-      .catch(errors => this.setState({ errors, isLoading: false }));
+      .catch(errors => this.setState({ errors, categoriesLoading: false }))
+      .then(() => this.isBothLoaded());
   };
   saveNewPost = async () => {
     const data = {
