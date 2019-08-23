@@ -26,7 +26,7 @@ type Post = {
   id: number;
   post: string;
   topic: string;
-  datetime: Date;
+  created: Date;
   pinned: boolean;
   modified: Date;
 };
@@ -229,7 +229,7 @@ class Posts extends React.Component<Props, State> {
           <div key={post.id} className="posts">
             <h5 className="post-topic">{post.topic}</h5>
             <h6 className="post-post">{post.post}</h6>
-            <Moment format="HH:mm DD.MM.YYYY">{post.datetime.toString()}</Moment>
+            <Moment format="HH:mm DD.MM.YYYY">{post.created.toString()}</Moment>
           </div>
         ))}
         <form>
