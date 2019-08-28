@@ -1,31 +1,34 @@
 import React, { useEffect } from 'react';
 import Posts from './components/Posts';
 import CreatePost from './components/CreatePost';
-import usePostsService from './services/usePostsService';
+import usePostService from './services/usePostService';
 import { Post } from './types/Post';
+import useCategoryService from './services/useCategoryService';
 
 const App: React.FC<{}> = () => {
-  const service = usePostsService();
+  const postService = usePostService();
+  const categoryService = useCategoryService();
 
-  function reloadPosts() {
-    service.fetchPosts();
-  }
-
-  function addPost(post: Post) {
-    service.result.status === 'loaded' &&
-      service.setResult({ status: 'loaded', payload: [...service.result.payload, post] });
-  }
+  const reFetch = () => {
+    postService.fetchPosts();
+    categoryService.fetchCategories();
+  };
+  const addPost = (post: Post) => {
+    postService.result.status === 'loaded' &&
+      postService.setResult({ status: 'loaded', payload: [...postService.result.payload, post] });
+  };
   useEffect(() => {
-    service.fetchPosts();
+    postService.fetchPosts();
+    categoryService.fetchCategories();
   }, []);
 
   return (
     <div className="App">
       <header className="header"></header>
       <div className="container">
-        <CreatePost addPost={addPost} />
+        <CreatePost addPost={addPost} categoryService={categoryService.result} />
         <h1>Epic Posts </h1>
-        <Posts posts={service.result} reloadPosts={reloadPosts} />
+        <Posts postService={postService.result} reFetch={reFetch} />
       </div>
     </div>
   );

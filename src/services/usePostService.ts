@@ -3,7 +3,7 @@ import { Service } from '../types/Service';
 import { Post } from '../types/Post';
 import { URL } from '../constants/constants';
 
-const usePostsService = () => {
+const usePostService = () => {
   const [result, setResult] = useState<Service<Post[]>>({
     status: 'loading'
   });
@@ -35,4 +35,4 @@ const usePostsService = () => {
   return { result, setResult, fetchPosts };
 };
 
-export default usePostsService;
+export default usePostService;

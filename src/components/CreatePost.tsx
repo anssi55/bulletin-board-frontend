@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { PulseLoader } from 'react-spinners';
-import useCategoriesService from '../services/useCategoriesService';
 import postPostService, { PostPost } from '../services/usePostPostService';
 import { Post } from '../types/Post';
+import { Service } from '../types/Service';
+import { Category } from '../types/Category';
 interface Props {
   addPost: (post: Post) => void;
+  categoryService: Service<Category[]>;
 }
 const CreatePost: React.FC<Props> = props => {
   const initialPostState: PostPost = {
@@ -13,8 +15,6 @@ const CreatePost: React.FC<Props> = props => {
     pinned: false,
     categoryId: 1
   };
-
-  const categoryService = useCategoriesService();
 
   const [post, setPost] = React.useState<PostPost>(initialPostState);
   const { service, makePost } = postPostService();
@@ -25,12 +25,16 @@ const CreatePost: React.FC<Props> = props => {
   const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
-    categoryService.status === 'loaded' &&
-      setPost(prevPost => ({
-        ...prevPost,
-        categoryId: categoryService.payload[0].id
-      }));
-  }, [categoryService]);
+    props.categoryService.status === 'loaded' &&
+      setInitialCategory(props.categoryService.payload[1].id);
+  }, [props.categoryService]);
+
+  const setInitialCategory = (id: number) => {
+    setPost(prevPost => ({
+      ...prevPost,
+      categoryId: id
+    }));
+  };
 
   const handleTopicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.persist();
@@ -152,8 +156,8 @@ const CreatePost: React.FC<Props> = props => {
             onChange={handleCategoryChange}
             name="categoryId"
           >
-            {categoryService.status === 'loaded' &&
-              categoryService.payload.map(category => (
+            {props.categoryService.status === 'loaded' &&
+              props.categoryService.payload.map(category => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
