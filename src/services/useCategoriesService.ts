@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Service } from '../types/Service';
-import { URL } from '../constants';
+import { URL } from '../constants/constants';
 import { Category } from '../types/Category';
 
-const fetchCategories = () => {
+const useCategoriesService = () => {
   const [result, setResult] = useState<Service<Category[]>>({
     status: 'loading'
   });
@@ -26,4 +26,4 @@ const fetchCategories = () => {
   return result;
 };
 
-export default fetchCategories;
+export default useCategoriesService;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Service } from '../types/Service';
 import { Post } from '../types/Post';
-import { URL } from '../constants';
+import { URL } from '../constants/constants';
 
 export type PostPost = {
   post: string;
@@ -10,7 +10,7 @@ export type PostPost = {
   categoryId: number;
 };
 
-const postPost = () => {
+const usePostPostService = () => {
   const [service, setService] = useState<Service<Post>>({
     status: 'init'
   });
@@ -18,7 +18,7 @@ const postPost = () => {
   const makePost = (post: PostPost) => {
     setService({ status: 'loading' });
 
-    return new Promise((resolve, reject) => {
+    return new Promise<Post>((resolve, reject) => {
       fetch(URL + 'posts', {
         method: 'POST',
         mode: 'cors',
@@ -48,4 +48,4 @@ const postPost = () => {
   };
 };
 
-export default postPost;
+export default usePostPostService;
