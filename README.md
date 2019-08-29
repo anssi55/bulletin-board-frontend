@@ -1,5 +1,18 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Live demo
+
+App is running on web developer platform, Netlify.  
+Backend side of the app is running on Heroku platform.
+
+More information about the backend:
+
+https://github.com/anssi55/Epic-bulletin-board-backend-project
+
+You can test app in action here:
+
+https://determined-lamarr-85700d.netlify.com/
+
 ## Prerequisites
 
 Node.js is needed when running npm commands.  
