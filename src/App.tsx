@@ -8,6 +8,10 @@ const App: React.FC<{}> = () => {
   let postService = usePostService();
   let categoryService = useCategoryService();
 
+  const reFetchPost = () => {
+    postService.fetchPosts();
+  };
+
   const reFetch = () => {
     postService.fetchPosts();
     categoryService.fetchCategories();
@@ -17,8 +21,7 @@ const App: React.FC<{}> = () => {
     <div className="App">
       <header className="header"></header>
       <div className="container">
-        <CreatePost addPost={postService.addPost} categoryService={categoryService.result} />
-        <h1>Epic Posts </h1>
+        <CreatePost reFetchPosts={reFetchPost} categoryService={categoryService.result} />
         <Posts postService={postService.result} reFetch={reFetch} />
       </div>
     </div>

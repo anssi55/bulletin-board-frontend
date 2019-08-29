@@ -7,10 +7,6 @@ const usePostService = () => {
   const [result, setResult] = useState<Service<Post[]>>({
     status: 'loading'
   });
-  const addPost = (post: Post) => {
-    result.status === 'loaded' &&
-      setResult({ status: 'loaded', payload: [...result.payload, post] });
-  };
 
   const fetchPosts = () => {
     setResult({ status: 'loading' });
@@ -34,7 +30,7 @@ const usePostService = () => {
   useEffect(() => {
     fetchPosts();
   }, []);
-  return { result, setResult, fetchPosts, addPost };
+  return { result, setResult, fetchPosts };
 };
 
 export default usePostService;

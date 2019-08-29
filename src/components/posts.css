@@ -1,0 +1,39 @@
+.posts {
+  padding: 10px;
+}
+
+.topicRow {
+  background-color: bisque;
+}
+
+.pinned {
+  display: inline;
+}
+.topic {
+  padding-left: 5px;
+  font-size: 1.5em;
+  display: inline;
+}
+.info {
+  background-color: #fff3e7;
+  padding-top: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+.post {
+  padding-top: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+}
+.postsContainer {
+  background-color: #ffe;
+  text-align: left;
+}
+.thread {
+  margin-top: 10px;
+  border: 2px solid rgb(175, 118, 32);
+  border-radius: 5px;
+  width: 100%;
+}
