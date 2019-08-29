@@ -1,8 +1,20 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Prerequisites
+
+Node.js is needed when running npm commands.  
+This application is using version 12.5.0 of node.js.
+
+Download compatible version from:  
+https://nodejs.org
+
 ## Available Scripts
 
 In the project directory, you can run:
+
+### `npm install`
+
+Installs dependencies you need to run the app.
 
 ### `npm start`
 
