@@ -4,8 +4,9 @@ import postPostService, { PostPost } from '../services/usePostPostService';
 import { Post } from '../types/Post';
 import { Service } from '../types/Service';
 import { Category } from '../types/Category';
+import './createPost.css';
 interface Props {
-  addPost: (post: Post) => void;
+  reFetchPosts: (post: Post) => void;
   categoryService: Service<Category[]>;
 }
 const CreatePost: React.FC<Props> = props => {
@@ -22,7 +23,6 @@ const CreatePost: React.FC<Props> = props => {
   const [topicError, setTopicError] = useState('');
   const [postValid, setPostValid] = useState(false);
   const [topicValid, setTopicValid] = useState(false);
-  const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
     props.categoryService.status === 'loaded' &&
@@ -56,9 +56,8 @@ const CreatePost: React.FC<Props> = props => {
     event.persist();
     setPost(prevPost => ({
       ...prevPost,
-      [event.target.name]: event.target.checked
+      pinned: event.target.checked
     }));
-    handlePinnedChange(event);
   };
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     event.persist();
@@ -68,10 +67,10 @@ const CreatePost: React.FC<Props> = props => {
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
     event.preventDefault();
     makePost(post)
-      .then(result => props.addPost(result))
+      .then(result => props.reFetchPosts(result))
       .then(() => setPost(initialPostState));
   };
 
@@ -85,7 +84,6 @@ const CreatePost: React.FC<Props> = props => {
     } else {
       setPostValid(true);
       setPostError('');
-      isAllValid();
     }
   };
   const validateTopic = (topic: String) => {
@@ -98,24 +96,15 @@ const CreatePost: React.FC<Props> = props => {
     } else {
       setTopicValid(true);
       setTopicError('');
-      isAllValid();
-    }
-  };
-
-  const isAllValid = () => {
-    if (postValid && topicValid) {
-      setFormValid(true);
-    } else {
-      setFormValid(false);
     }
   };
 
   return (
-    <>
+    <div className="createPostContainer">
       {props.categoryService.status === 'loaded' && (
         <div className="postForm">
-          <form onSubmit={handleSubmit}>
-            <div>
+          <form>
+            <div className="formTopic">
               <label>
                 Topic:
                 <input
@@ -126,9 +115,9 @@ const CreatePost: React.FC<Props> = props => {
                   onChange={handleTopicChange}
                 />
               </label>
-              {topicError}
+              <div className="error">{topicError}</div>
             </div>
-            <div>
+            <div className="formPost">
               <label>
                 Post:
                 <textarea
@@ -138,9 +127,10 @@ const CreatePost: React.FC<Props> = props => {
                   onChange={handlePostChange}
                 />
               </label>
-              {postError}
+              <div className="error">{postError}</div>
             </div>
-            <div>
+
+            <div className="formPinned">
               <label>
                 Pinned:
                 <input
@@ -151,19 +141,26 @@ const CreatePost: React.FC<Props> = props => {
                 />
               </label>
             </div>
-            <select
-              className="categoryDropdown"
-              value={post.categoryId}
-              onChange={handleCategoryChange}
-              name="categoryId"
-            >
-              {props.categoryService.payload.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <input type="submit" className="button" disabled={!formValid} />
+            <div className="submit">
+              <select
+                className="categoryDropdown"
+                value={post.categoryId}
+                onChange={handleCategoryChange}
+                name="categoryId"
+              >
+                {props.categoryService.payload.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="submit"
+                className="button"
+                disabled={!postValid || !topicValid}
+                onClick={handleSubmit}
+              />
+            </div>
           </form>
         </div>
       )}
@@ -176,7 +173,7 @@ const CreatePost: React.FC<Props> = props => {
       {service.status === 'error' && (
         <div className="postingErrors">Error. Post could not be the posted!</div>
       )}
-    </>
+    </div>
   );
 };
 
