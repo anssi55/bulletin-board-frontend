@@ -1,5 +1,11 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Live demo
+
+You can test app in action here:
+
+https://determined-lamarr-85700d.netlify.com/
+
 ## Prerequisites
 
 Node.js is needed when running npm commands.  
