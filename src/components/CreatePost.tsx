@@ -23,7 +23,6 @@ const CreatePost: React.FC<Props> = props => {
   const [topicError, setTopicError] = useState('');
   const [postValid, setPostValid] = useState(false);
   const [topicValid, setTopicValid] = useState(false);
-  const [formValid, setFormValid] = useState(false);
 
   useEffect(() => {
     props.categoryService.status === 'loaded' &&
@@ -44,7 +43,6 @@ const CreatePost: React.FC<Props> = props => {
       [event.target.name]: event.target.value
     }));
     validateTopic(event.target.value);
-    isAllValid();
   };
   const handlePostChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     event.persist();
@@ -53,7 +51,6 @@ const CreatePost: React.FC<Props> = props => {
       [event.target.name]: event.target.value
     }));
     validatePost(event.target.value);
-    isAllValid();
   };
   const handlePinnedChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.persist();
@@ -99,14 +96,6 @@ const CreatePost: React.FC<Props> = props => {
     } else {
       setTopicValid(true);
       setTopicError('');
-    }
-  };
-
-  const isAllValid = () => {
-    if (postValid && topicValid) {
-      setFormValid(true);
-    } else {
-      setFormValid(false);
     }
   };
 
@@ -168,7 +157,7 @@ const CreatePost: React.FC<Props> = props => {
               <input
                 type="submit"
                 className="button"
-                disabled={!formValid}
+                disabled={!postValid || !topicValid}
                 onClick={handleSubmit}
               />
             </div>

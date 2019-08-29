@@ -30,7 +30,7 @@ const usePostService = () => {
   useEffect(() => {
     fetchPosts();
   }, []);
-  return { result, setResult, fetchPosts };
+  return { result, fetchPosts };
 };
 
 export default usePostService;
