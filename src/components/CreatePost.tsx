@@ -112,60 +112,61 @@ const CreatePost: React.FC<Props> = props => {
 
   return (
     <>
-      <div className="postForm">
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>
-              Topic:
-              <input
-                type="text"
-                placeholder="Insert topic here.."
-                name="topic"
-                value={post.topic}
-                onChange={handleTopicChange}
-              />
-            </label>
-            {topicError}
-          </div>
-          <div>
-            <label>
-              Post:
-              <textarea
-                name="post"
-                value={post.post}
-                placeholder="Insert post here.."
-                onChange={handlePostChange}
-              />
-            </label>
-            {postError}
-          </div>
-          <div>
-            <label>
-              Pinned:
-              <input
-                name="pinned"
-                type="checkbox"
-                checked={post.pinned}
-                onChange={handlePinnedChange}
-              />
-            </label>
-          </div>
-          <select
-            className="categoryDropdown"
-            value={post.categoryId}
-            onChange={handleCategoryChange}
-            name="categoryId"
-          >
-            {props.categoryService.status === 'loaded' &&
-              props.categoryService.payload.map(category => (
+      {props.categoryService.status === 'loaded' && (
+        <div className="postForm">
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label>
+                Topic:
+                <input
+                  type="text"
+                  placeholder="Insert topic here.."
+                  name="topic"
+                  value={post.topic}
+                  onChange={handleTopicChange}
+                />
+              </label>
+              {topicError}
+            </div>
+            <div>
+              <label>
+                Post:
+                <textarea
+                  name="post"
+                  value={post.post}
+                  placeholder="Insert post here.."
+                  onChange={handlePostChange}
+                />
+              </label>
+              {postError}
+            </div>
+            <div>
+              <label>
+                Pinned:
+                <input
+                  name="pinned"
+                  type="checkbox"
+                  checked={post.pinned}
+                  onChange={handlePinnedChange}
+                />
+              </label>
+            </div>
+            <select
+              className="categoryDropdown"
+              value={post.categoryId}
+              onChange={handleCategoryChange}
+              name="categoryId"
+            >
+              {props.categoryService.payload.map(category => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
               ))}
-          </select>
-          <input type="submit" className="button" disabled={!formValid} />
-        </form>
-      </div>
+            </select>
+            <input type="submit" className="button" disabled={!formValid} />
+          </form>
+        </div>
+      )}
       {service.status === 'loading' && (
         <div className="loader-container">
           <PulseLoader />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { PacmanLoader } from 'react-spinners';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, compareDesc } from 'date-fns';
 import { Service } from '../types/Service';
 import { Post } from '../types/Post';
 
@@ -18,13 +18,17 @@ const Posts: React.FC<Props> = props => {
           </div>
         )}
         {props.postService.status === 'loaded' &&
-          props.postService.payload.reverse().map(post => (
-            <div key={post.id}>
-              <h5 className="post-topic">{post.topic}</h5>
-              <h6 className="post-post">{post.post}</h6>
-              <h6> {format(parseISO(post.created.toString()), 'Pp')}</h6>
-            </div>
-          ))}
+          props.postService.payload
+            .sort(function(a, b) {
+              return compareDesc(parseISO(a.created.toString()), parseISO(b.created.toString()));
+            })
+            .map(post => (
+              <div key={post.id}>
+                <h5 className="post-topic">{post.topic}</h5>
+                <h6 className="post-post">{post.post}</h6>
+                <h6> {format(parseISO(post.created.toString()), 'Pp')}</h6>
+              </div>
+            ))}
       </div>
       {props.postService.status === 'error' && (
         <div>
